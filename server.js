@@ -24,7 +24,7 @@ const tokenVerify = require('./auth') // token verify
 const getProduct = require('./get')
 const postProduct = require('./postGraph')
 const deleteProduct = require('./delete')
-const putProduct = require('./put')
+const putProduct = require('./updateGraph')
 
 const postLogin = require('./login')
 const getLogin = require('./getlogin')
@@ -42,6 +42,7 @@ const schema = buildSchema(`
     product(id: String!): Product,
     products: [Product]
     addProduct: [Product]
+    editProduct: [Product]
   }
 
   type Product {
@@ -60,6 +61,13 @@ const schema = buildSchema(`
       description: String,
       date: String
     ): [Product]
+    
+    editProduct(
+      id: String,
+      name: String,
+      price: Int,
+      description: String
+    ): [Product]
   }
 
 `);
@@ -74,7 +82,8 @@ const root = {
     products: () => {
       return products
     },
-    addProduct: postProduct
+    addProduct: postProduct,
+    editProduct: putProduct
 };
 
 app.use('/graphql',tokenVerify, graphqlHTTP({
@@ -99,7 +108,7 @@ app.get('/',tokenVerify, getLogin())
 // app.get('/products',tokenVerify, getProduct(products))
 // app.post('/products', tokenVerify, postProduct(products))
 app.delete('/products/:id', tokenVerify, deleteProduct(products))
-app.put('/products/:id', tokenVerify, putProduct(products))
+// app.put('/products/:id', tokenVerify, putProduct(products))
 
 
 app.listen(port, (err) => {
